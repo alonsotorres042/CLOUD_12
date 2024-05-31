@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+    <body>
+        <h1> Mi primera pagina </h1>
+        <?php
+$servername = "localhost";
+$username = "tu_usuario";
+$password = "tu_contraseña";
+$dbname = "nombre_base_de_datos";
+
+// Conexión
+$conn = new mysqli($servername, $username, $password, $dbname);
+
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+echo "Connected successfully";
+?>
+
+function addUser($username, $password, $creator) {
+    global $conn;
+
+    $stmt = $conn->prepare("CALL AddUser(?, ?, ?)");
+    $stmt->bind_param("sss", $username, $password, $creator);
+
+    if ($stmt->execute()) {
+        echo "User added successfully";
+    } else {
+        echo "Error: " . $stmt->error;
+    }
+
+    $stmt->close();
+}
+
+// Llamar a la función
+addUser('nuevo_usuario', 'contraseña_segura', 'creador_usuario');
+    </body>
+</html>
