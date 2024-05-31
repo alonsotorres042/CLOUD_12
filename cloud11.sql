@@ -294,6 +294,7 @@ CREATE TABLE `gamescoresview` (
 ,`user_id` int(11)
 ,`game_score` int(11)
 ,`creation_time` datetime
+,`creator` varchar(255)
 ,`last_modified_time` datetime
 ,`modifier` varchar(255)
 );
