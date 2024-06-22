@@ -1,0 +1,90 @@
+<?php
+$host = 'localhost';
+$db = 'my_database';
+$user = 'your_username';
+$pass = 'your_password';
+
+try {
+    $pdo = new PDO("mysql:host=$host;dbname=$db", $user, $pass);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+} catch (PDOException $e) {
+    echo 'Error: ' . $e->getMessage();
+    die();
+}
+
+function createUser($name, $email, $age) {
+    global $pdo;
+    $sql = "INSERT INTO users (name, email, age) VALUES (:name, :email, :age)";
+    $stmt = $pdo->prepare($sql);
+    $stmt->bindParam(':name', $name);
+    $stmt->bindParam(':email', $email);
+    $stmt->bindParam(':age', $age);
+    if ($stmt->execute()) {
+        return $pdo->lastInsertId();
+    } else {
+        return false;
+    }
+}
+
+function getUsers() {
+    global $pdo;
+    $sql = "SELECT * FROM users";
+    $stmt = $pdo->query($sql);
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+function getUserById($id) {
+    global $pdo;
+    $sql = "SELECT * FROM users WHERE id = :id";
+    $stmt = $pdo->prepare($sql);
+    $stmt->bindParam(':id', $id);
+    $stmt->execute();
+    return $stmt->fetch(PDO::FETCH_ASSOC);
+}
+
+function updateUser($id, $name, $email, $age) {
+    global $pdo;
+    $sql = "UPDATE users SET name = :name, email = :email, age = :age WHERE id = :id";
+    $stmt = $pdo->prepare($sql);
+    $stmt->bindParam(':id', $id);
+    $stmt->bindParam(':name', $name);
+    $stmt->bindParam(':email', $email);
+    $stmt->bindParam(':age', $age);
+    return $stmt->execute();
+}
+
+function deleteUser($id) {
+    global $pdo;
+    $sql = "DELETE FROM users WHERE id = :id";
+    $stmt = $pdo->prepare($sql);
+    $stmt->bindParam(':id', $id);
+    return $stmt->execute();
+}
+
+$newId = createUser('John Doe', 'john@example.com', 30);
+if ($newId) {
+    echo "User created with ID: $newId\n";
+} else {
+    echo "Error creating user\n";
+}
+
+$users = getUsers();
+echo "Users:\n";
+print_r($users);
+
+$user = getUserById($newId);
+echo "User with ID $newId:\n";
+print_r($user);
+
+if (updateUser($newId, 'John Doe', 'john.doe@example.com', 31)) {
+    echo "User updated\n";
+} else {
+    echo "Error updating user\n";
+}
+
+if (deleteUser($newId)) {
+    echo "User deleted\n";
+} else {
+    echo "Error deleting user\n";
+}
+?>
